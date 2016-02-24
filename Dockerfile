@@ -44,7 +44,7 @@ RUN sed -i \
 	-e "s/\['host'\] = \"localhost\"/\['host'\] = getenv(\"MYSQL_HOST\")/" \ 
         -e "s/\['user'\] = \"phpipam\"/\['user'\] = getenv(\"MYSQL_USER\")/" \ 
         -e "s/\['pass'\] = \"phpipamadmin\"/\['pass'\] = getenv(\"MYSQL_PASSWORD\")/" \ 
-        -e "s/\['name'\] = \"phpipam\"/\['pass'\] = getenv(\"MYSQL_DB\")/" \ 
+        -e "s/\['name'\] = \"phpipam\"/\['name'\] = getenv(\"MYSQL_DB\")/" \ 
         -e "s/\['port'\] = 3306/\['port'\] = getenv(\"MYSQL_PORT\")/" \ 
         -e "s/\['ssl'\] *= false/\['ssl'\] = getenv(\"SSL\")/" \ 
         -e "s/\['ssl_key'\] *= \"\/path\/to\/cert.key\"/['ssl_key'\] = getenv(\"SSL_KEY\")/" \ 
