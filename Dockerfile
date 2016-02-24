@@ -1,10 +1,10 @@
 FROM php:5.6-apache
 MAINTAINER Clint Armstrong <clint@clintarmstrong.net>
 
-ENV PHPIPAM_SOURCE="https://github.com/phpipam/phpipam/archive/"
-    PHPIPAM_VERSION="1.2"
-    MYSQL_HOST="mysql"
-    MYSQL_USER="root"
+ENV PHPIPAM_SOURCE="https://github.com/phpipam/phpipam/archive/" \
+    PHPIPAM_VERSION="1.2" \
+    MYSQL_HOST="mysql" \
+    MYSQL_USER="root" \
     MYSQL_PASSWORD="phpipam"
 
 # Install required deb packages
@@ -20,7 +20,7 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
 	ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h && \
 	docker-php-ext-configure gmp --with-gmp=/usr/include/x86_64-linux-gnu && \
 	docker-php-ext-install gmp && \
-    docker-php-ext-install mcrypt && \
+        docker-php-ext-install mcrypt && \
 	echo ". /etc/environment" >> /etc/apache2/envvars && \
 	a2enmod rewrite
 
@@ -28,8 +28,8 @@ COPY php.ini /usr/local/etc/php/
 
 # copy phpipam sources to web dir
 ADD ${PHPIPAM_SOURCE}/${PHPIPAM_VERSION}.tar.gz /tmp/
-RUN	tar -xzf /tmp/${PHPIPAM_VERSION}.tar.gz -C /var/www/html/ --strip-components=1 
-RUN cp /var/www/html/config.dist.php /var/www/html/config.php
+RUN tar -xzf /tmp/${PHPIPAM_VERSION}.tar.gz -C /var/www/html/ --strip-components=1 && \
+    cp /var/www/html/config.dist.php /var/www/html/config.php
 
 # Use system environment variables into config.php
 RUN sed -i \ 
