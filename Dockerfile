@@ -3,7 +3,8 @@ MAINTAINER Clint Armstrong <clint@clintarmstrong.net>
 
 # Install required deb packages
 RUN apt-get update && \ 
-	apt-get install -y git php-pear php5-curl php5-mysql php5-json php5-gmp php5-mcrypt php5-ldap libgmp-dev libmcrypt-dev && \
+	apt-get install -y git php-pear php5-curl php5-mysql php5-json php5-gmp php5-mcrypt php5-ldap libgmp-dev \ 
+	libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libpng12-dev && \
 	rm -rf /var/lib/apt/lists/*
 
 # Configure apache and required PHP modules 
@@ -15,11 +16,15 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
 	docker-php-ext-configure gmp --with-gmp=/usr/include/x86_64-linux-gnu && \
 	docker-php-ext-install gmp && \
         docker-php-ext-install mcrypt && \
+	docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
+	docker-php-ext-install -j$(nproc) gd && \
+	docker-php-ext-install sockets && \
+	docker-php-ext-install pcntl && \
 	echo ". /etc/environment" >> /etc/apache2/envvars && \
 	a2enmod rewrite
 
 ENV PHPIPAM_SOURCE="https://github.com/phpipam/phpipam/archive/" \
-    PHPIPAM_VERSION="1.2" \
+    PHPIPAM_VERSION="1.3" \
     MYSQL_HOST="mysql" \
     MYSQL_USER="phpipam" \
     MYSQL_PASSWORD="phpipamadmin" \
@@ -41,10 +46,10 @@ RUN tar -xzf /tmp/${PHPIPAM_VERSION}.tar.gz -C /var/www/html/ --strip-components
 
 # Use system environment variables into config.php
 RUN sed -i \ 
-	-e "s/\['host'\] = \"localhost\"/\['host'\] = getenv(\"MYSQL_HOST\")/" \ 
-        -e "s/\['user'\] = \"phpipam\"/\['user'\] = getenv(\"MYSQL_USER\")/" \ 
-        -e "s/\['pass'\] = \"phpipamadmin\"/\['pass'\] = getenv(\"MYSQL_PASSWORD\")/" \ 
-        -e "s/\['name'\] = \"phpipam\"/\['name'\] = getenv(\"MYSQL_DB\")/" \ 
+	-e "s/\['host'\] = 'localhost'/\['host'\] = getenv(\"MYSQL_HOST\")/" \ 
+        -e "s/\['user'\] = 'phpipam'/\['user'\] = getenv(\"MYSQL_USER\")/" \ 
+        -e "s/\['pass'\] = 'phpipamadmin'/\['pass'\] = getenv(\"MYSQL_PASSWORD\")/" \ 
+        -e "s/\['name'\] = 'phpipam'/\['name'\] = getenv(\"MYSQL_DB\")/" \ 
         -e "s/\['port'\] = 3306/\['port'\] = getenv(\"MYSQL_PORT\")/" \ 
         -e "s/\['ssl'\] *= false/\['ssl'\] = getenv(\"SSL\")/" \ 
         -e "s/\['ssl_key'\] *= \"\/path\/to\/cert.key\"/['ssl_key'\] = getenv(\"SSL_KEY\")/" \ 
