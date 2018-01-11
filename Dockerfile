@@ -1,18 +1,18 @@
 FROM php:5.6-apache
-MAINTAINER Clint Armstrong <clint@clintarmstrong.net>
 
 # Install required deb packages
 RUN apt-get update && \ 
-	apt-get install -y git php-pear php5-curl php5-mysql php5-json php5-gmp php5-mcrypt php5-ldap libgmp-dev libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libpng12-dev libldb-dev libldap2-dev && \
+	apt-get install -y git libgmp-dev libmcrypt-dev libfreetype6-dev libjpeg62-turbo-dev libpng12-dev libldb-dev libldap2-dev libcurl4-openssl-dev && \
 	ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so && \
 	ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so && \
 	rm -rf /var/lib/apt/lists/*
 
 # Configure apache and required PHP modules 
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
+RUN docker-php-ext-install curl mysql json && \
+    docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
 	docker-php-ext-install mysqli && \
 	docker-php-ext-install pdo_mysql && \
-        docker-php-ext-install gettext && \ 
+    docker-php-ext-install gettext && \ 
 	ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h && \
 	docker-php-ext-configure gmp --with-gmp=/usr/include/x86_64-linux-gnu && \
 	docker-php-ext-install gmp && \
@@ -45,7 +45,7 @@ COPY php.ini /usr/local/etc/php/
 ADD ${PHPIPAM_SOURCE}/${PHPIPAM_VERSION}.tar.gz /tmp/
 RUN tar -xzf /tmp/${PHPIPAM_VERSION}.tar.gz -C /var/www/html/ --strip-components=1 && \
     cp /var/www/html/config.dist.php /var/www/html/config.php && \
-    echo "\\n\\nSetEnvIf X-Forwarded-Proto https HTTPS=on" | tee -a /var/www/html/.htaccess
+    echo "\n\nSetEnvIf X-Forwarded-Proto https HTTPS=on" | tee -a /var/www/html/.htaccess
 
 # Use system environment variables into config.php
 RUN sed -i \ 
