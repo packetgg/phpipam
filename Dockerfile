@@ -44,7 +44,8 @@ COPY php.ini /usr/local/etc/php/
 # copy phpipam sources to web dir
 ADD ${PHPIPAM_SOURCE}/${PHPIPAM_VERSION}.tar.gz /tmp/
 RUN tar -xzf /tmp/${PHPIPAM_VERSION}.tar.gz -C /var/www/html/ --strip-components=1 && \
-    cp /var/www/html/config.dist.php /var/www/html/config.php
+    cp /var/www/html/config.dist.php /var/www/html/config.php && \
+    echo "\\n\\nSetEnvIf X-Forwarded-Proto https HTTPS=on" | tee -a /var/www/html/.htaccess
 
 # Use system environment variables into config.php
 RUN sed -i \ 
