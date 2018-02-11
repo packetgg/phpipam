@@ -37,7 +37,8 @@ ENV PHPIPAM_SOURCE="https://github.com/phpipam/phpipam/archive/" \
     SSL_CERT="/path/to/cert.crt" \
     SSL_CA="/path/to/ca.crt" \
     SSL_CAPATH="/path/to/ca_certs" \
-    SSL_CIPHER="DHE-RSA-AES256-SHA:AES128-SHA"
+    SSL_CIPHER="DHE-RSA-AES256-SHA:AES128-SHA" \
+    TMPTABLE_ENGINE_TYPE="MEMORY"
 
 COPY php.ini /usr/local/etc/php/
 
@@ -54,6 +55,7 @@ RUN sed -i \
     -e "s/\['pass'\] = 'phpipamadmin'/\['pass'\] = getenv(\"MYSQL_PASSWORD\")/" \ 
     -e "s/\['name'\] = 'phpipam'/\['name'\] = getenv(\"MYSQL_DB\")/" \ 
     -e "s/\['port'\] = 3306/\['port'\] = getenv(\"MYSQL_PORT\")/" \ 
+    -e "s/\['tmptable_engine_type'\] = \"MEMORY\"/\['tmptable_engine_type'\] = getenv(\"TMPTABLE_ENGINE_TYPE\")/" \
     -e "s/\['ssl'\] *= false/\['ssl'\] = getenv(\"SSL\")/" \ 
     -e "s/\['ssl_key'\] *= '\/path\/to\/cert.key'/['ssl_key'\] = getenv(\"SSL_KEY\")/" \ 
     -e "s/\['ssl_cert'\] *= '\/path\/to\/cert.crt'/['ssl_cert'\] = getenv(\"SSL_CERT\")/" \ 
